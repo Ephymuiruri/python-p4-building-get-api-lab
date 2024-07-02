@@ -20,19 +20,47 @@ def index():
 
 @app.route('/bakeries')
 def bakeries():
-    return ''
+    bakeries = []
+    for bakery in Bakery.query.all():
+        bakeries.append(bakery.to_dict())
+    response = make_response(
+        bakeries,200,{'Content-Type':'application/json'}
+    )
+    return response
 
 @app.route('/bakeries/<int:id>')
 def bakery_by_id(id):
-    return ''
+    bakery = Bakery.query.filter(Bakery.id == id).first()
+    if bakery:
+        response = make_response(
+            bakery.to_dict(),200,{'Content-Type':'application/json'}
+        )
+    else:
+        response = make_response(
+            {'error':'Bakery not found'},404,{'Content-Type':'application/json'}
+        )
+    return response
 
 @app.route('/baked_goods/by_price')
 def baked_goods_by_price():
-    return ''
+    baked_goods = [goods.to_dict() for goods in BakedGood.query.order_by(BakedGood.price.desc()).all()]
+    response = make_response(
+        baked_goods,200,{'Content-Type':'application/json'}
+    )
+    return response
 
 @app.route('/baked_goods/most_expensive')
 def most_expensive_baked_good():
-    return ''
+    baked_good = (BakedGood.query.order_by(BakedGood.price.desc()).first()).to_dict()
+    if baked_good:
+        response = make_response(
+            baked_good,200,{'Content-Type':'application/json'}
+        )
+    else:
+        response = make_response(
+            {'error':'No baked goods found'},404,{'Content-Type':'application/json'}
+        )
+    return response
 
 if __name__ == '__main__':
     app.run(port=5555, debug=True)
